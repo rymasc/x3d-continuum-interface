@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Ryan Scott X3D</title>
+	<meta charset="UTF-8">
+	<!--<link rel="stylesheet" type="text/css" href="http://www.x3dom.org/x3dom/release/x3dom.css"></link>-->
+	<link rel="stylesheet" type="text/css" href="/css/model.css"></link>
+	<!-- <link rel="stylesheet" href="/css/bootstrap.min.css" ></link> -->
+
+	<script src="/js/lib/x3dom.js"></script>
+	<script src="/js/lib/jquery.js"></script>
+	<script src="/js/lib/qwikMath.js"></script>
+	<script src="/js/lib/sylvester.js"></script>
+	<script src="/js/lib/transform.js"></script>
+	<script src="/js/lib/fileComm.js"></script>
+	<script src="/js/obj/x3dSphere.js"></script>
+	<script src="/js/obj/Coordinate.js"></script>
+	<script src="/js/obj/Color.js"></script>
+	<script src="/js/obj/Section.js"></script>
+	<script src="/js/obj/Octarm.js"></script>
+	<script src="/js/main.js"></script>
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+
+</head>
+<body>
+	<h2> X3D Interface </h2>
+
+
+	<div class="row">
+		<div class="column">
+			<h3> Base Properties </h3>
+			<label for="bcolor"> Base Color </label>
+			<input id="bcolor" type="color" value="#0000ff">
+			<p id="blength">[ERROR]: No Base</p>
+			<p id ="bcurve">[ERROR]: No Base</p>
+			<p id="borient">[ERROR]: No Base</p>
+			<input type="checkbox" id="extendBase">S</input>
+			<input type="checkbox" id="curveBase">&Kappa;</input>
+			<input type="checkbox" id="orientBase">&Phi;</input>
+		</div>
+
+		<div class="column">
+			<h3> Midsection Properties </h3>
+			<label for="mcolor"> Midsection Color </label>
+			<input id="mcolor" type="color" value="#00ff00">
+			<p id="mlength">[ERROR]: No Mid</p>
+			<p id="mcurve">[ERROR]: No Mid</p>
+			<p id="morient">[ERROR]:No Mid</p>
+			<input type="checkbox" id="extendMid">S</input>
+			<input type="checkbox" id="curveMid">&Kappa;</input>
+			<input type="checkbox" id="orientMid">&Phi;</input>
+		</div>
+
+		<div class="column">
+			<h3> Tip Properties </h3>
+			<label for="tcolor">Tip Color </label>
+			<input id="tcolor" type="color" value="#ff0000">
+			<p id=tlength>[ERROR]: No Tip</p>
+			<p id=tcurve>[ERROR]: No Tip</p>
+			<p id=torient>[ERROR]: No Tip</p>
+			<input type="checkbox" id="extendTip">S</input>
+			<input type="checkbox" id="curveTip">&Kappa;</input>
+			<input type="checkbox" id="orientTip">&Phi;</input>
+		</div>
+	</div>
+
+	<div class="ui">
+		<button id="extend"> Extend (S) &larr; &rarr; </button>
+		<button id="compress"> Compress (S) &rarr; &larr; </button>
+		<button id="curveL"> Curve (&Kappa;) &larr; </button>
+		<button id="curveR"> Curve (&Kappa;) &rarr; </button>
+		<button id="orientCW"> Orient (&Phi;) &#8635; </button>
+		<button id="orientCCW"> Orient (&Phi;) &#8634; </button>
+		<!-- <button id="writeFile">Write File</button> -->
+		<button id="reloadPage"> Home </button>
+		<button id="downloadTxt">Download Configuration</button>
+	</div>
+
+
+	<p id="outputbox"></p>
+	<div id="x3dcontent">
+	<x3d id="the_model" width="100%" height="100%">
+		<scene>
+			<!--Set Up Viewpoint along -y axis -->
+			<transform rotation = "1 0 0 1.57">
+				<transform rotation="1 0 1 3.14">
+					<Viewpoint position = "0 -0.5 1.5"></Viewpoint>
+				</transform>
+			</transform>
+			<!-- Draw Coordinate Axes -->
+			<!-- magenta -->
+			<transform id="xaxis" DEF="xaxis" translation="0 0 0">
+				<shape>
+					<appearance>
+						<material diffuseColor="1 0 1"></material>
+					</appearance>
+					<cylinder radius="0.01" height=".1"></cylinder>
+				</shape>
+			</transform>
+			<!-- cyan -->
+			<transform id="yaxis" DEF="yaxis" translation="0 0 0" rotation="0 0 1 1.57">
+				<shape>
+					<appearance>
+						<material diffuseColor="0 1 1"></material>
+					</appearance>
+					<cylinder radius="0.01" height=".1"></cylinder>
+				</shape>
+			</transform>
+			<!-- yellow -->
+			<transform id="zaxis" DEF="zaxis" translation="0 0 0" rotation="1 0 0 1.57">
+				<shape>
+					<appearance>
+						<material diffuseColor="1 1 0"></material>
+					</appearance>
+					<cylinder radius="0.01" height=".1"></cylinder>
+				</shape>
+			</transform>
+
+			<!-- Anchor Node -->
+			<transform id="a" DEF="a" translation='0 0 0'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<!--Base Section Nodes-->
+
+			<transform id="b0" DEF="b0" translation='0 0 0.0070'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="b1" DEF="b1" translation='0 0 0.0140'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b2" DEF="b2" translation='0 0 .0209'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b3" DEF="b3" translation='0 0 .0279'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="b4" DEF="b4" translation='0 0 .0349'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b5" DEF="b5" translation='0 0 .0419'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b6" DEF="b6" translation='0 0 .0488'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="b7" DEF="b7" translation='0 0 .0558'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b8" DEF="b8" translation='0 0 .0628'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b9" DEF="b0" translation='0 0 .0698'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b10" DEF="b2" translation='0 0 .0768'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b11" DEF="b3" translation='0 0 .0837'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="b12" DEF="b4" translation='0 0 .0907'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b13" DEF="b5" translation='0 0 .0977'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b14" DEF="b6" translation='0 0 .1047'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="b15" DEF="b7" translation='0 0 .1116'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b16" DEF="b8" translation='0 0 .1186'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b17" DEF="b0" translation='0 0 .1256'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="b18" DEF="b1" translation='0 0 .1326'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b19" DEF="b1" translation='0 0 .1396'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b20" DEF="b2" translation='0 0 .1465'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b21" DEF="b3" translation='0 0 .1535'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="b22" DEF="b4" translation='0 0 .1605'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b23" DEF="b5" translation='0 0 .1675'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b24" DEF="b8" translation='0 0 .1744'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b25" DEF="b0" translation='0 0 .1814'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="b26" DEF="b1" translation='0 0 .1884'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b27" DEF="b2" translation='0 0 .1954'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b28" DEF="b3" translation='0 0 .2024'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="b29" DEF="b4" translation='0 0 .2093'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b30" DEF="b5" translation='0 0 .2163'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b31" DEF="b6" translation='0 0 .2233'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="b32" DEF="b7" translation='0 0 .2303'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b33" DEF="b8" translation='0 0 .2372'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b34" DEF="b0" translation='0 0 .2442'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="b35" DEF="b1" translation='0 0 .2512'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b36" DEF="b2" translation='0 0 .2582'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b37" DEF="b3" translation='0 0 .2652'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="b38" DEF="b4" translation='0 0 .2721'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b39" DEF="b5" translation='0 0 .2791'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b40" DEF="b6" translation='0 0 .2861'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="b41" DEF="b7" translation='0 0 .2931'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b42" DEF="b8" translation='0 0 .3000'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b43" DEF="b1" translation='0 0 .3070'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="b44" DEF="b1" translation='0 0 .3140'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 0 1'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+
+			<!--Midsection Nodes-->
+
+			<transform id="m0" DEF="m0" translation='0 0 .3210'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="m1" DEF="m1" translation='0 0 .3280'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m2" DEF="m2" translation='0 0 .3349'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m3" DEF="m3" translation='0 0 .3419'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="m4" DEF="m4" translation='0 0 .3489'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m5" DEF="m5" translation='0 0 .3559'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m6" DEF="m6" translation='0 0 .3628'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="m7" DEF="m7" translation='0 0 .3698'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m8" DEF="m8" translation='0 0 .3768'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m9" DEF="m9" translation='0 0 .3838'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m10" DEF="m10" translation='0 0 .3908'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m11" DEF="m11" translation='0 0 .3977'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="m12" DEF="m12" translation='0 0 .4047'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m13" DEF="m13" translation='0 0 .4117'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m14" DEF="m14" translation='0 0 .4187'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="m15" DEF="m15" translation='0 0 .4256'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m16" DEF="m16" translation='0 0 .4326'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m17" DEF="m17" translation='0 0 .4396'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="m18" DEF="m18" translation='0 0 .4466'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m19" DEF="m19" translation='0 0 .4536'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m20" DEF="m20" translation='0 0 .4605'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m21" DEF="m21" translation='0 0 .4675'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="m22" DEF="m22" translation='0 0 .4745'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m23" DEF="m23" translation='0 0 .4815'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m24" DEF="m24" translation='0 0 .4884'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m25" DEF="m25" translation='0 0 .4954'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="m26" DEF="m26" translation='0 0 .5024'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m27" DEF="m27" translation='0 0 .5094'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m28" DEF="m28" translation='0 0 .5164'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="m29" DEF="m29" translation='0 0 .5233'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m30" DEF="m30" translation='0 0 .5303'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m31" DEF="m31" translation='0 0 .5373'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="m32" DEF="m32" translation='0 0 .5443'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m33" DEF="m33" translation='0 0 .5512'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m34" DEF="m0" translation='0 0 .5582'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="m35" DEF="m1" translation='0 0 .5652'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m36" DEF="m2" translation='0 0 .5722'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m37" DEF="m3" translation='0 0 .5792'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="m38" DEF="m4" translation='0 0 .5861'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m39" DEF="m5" translation='0 0 .5931'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m40" DEF="m6" translation='0 0 .6001'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="m41" DEF="m7" translation='0 0 .6071'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m42" DEF="m8" translation='0 0 .6140'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m43" DEF="m1" translation='0 0 .6210'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="m44" DEF="m1" translation='0 0 .6280'>
+				<shape>
+					<appearance>
+						<material diffuseColor='0 1 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+            <!--Tip Section Nodes-->
+
+			<transform id="t0" DEF="t0" translation='0 0 .6350'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="t1" DEF="t1" translation='0 0 .6420'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t2" DEF="t2" translation='0 0 .6489'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t3" DEF="t3" translation='0 0 .6559'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="t4" DEF="t4" translation='0 0 .6629'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t5" DEF="t5" translation='0 0 .6699'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t6" DEF="t6" translation='0 0 .6768'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="t7" DEF="t7" translation='0 0 .6838'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t8" DEF="t8" translation='0 0 .6908'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t9" DEF="t0" translation='0 0 .6978'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t10" DEF="t2" translation='0 0 .7048'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t11" DEF="t3" translation='0 0 .7117'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="t12" DEF="t4" translation='0 0 .7187'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t13" DEF="t5" translation='0 0 .7257'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t14" DEF="t6" translation='0 0 .7327'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="t15" DEF="t7" translation='0 0 .7396'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t16" DEF="t8" translation='0 0 .7466'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t17" DEF="t0" translation='0 0 .7536'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="t18" DEF="t1" translation='0 0 .7606'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t19" DEF="t1" translation='0 0 .7676'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t20" DEF="t2" translation='0 0 .7745'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t21" DEF="t3" translation='0 0 .7815'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="t22" DEF="t4" translation='0 0 .7885'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t23" DEF="t5" translation='0 0 .7955'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t24" DEF="t8" translation='0 0 .8024'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t25" DEF="t0" translation='0 0 .8094'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="t26" DEF="t1" translation='0 0 .8164'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t27" DEF="t2" translation='0 0 .8234'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t28" DEF="t3" translation='0 0 .8304'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="t29" DEF="t4" translation='0 0 .8373'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t30" DEF="t5" translation='0 0 .8443'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t31" DEF="t6" translation='0 0 .8513'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="t32" DEF="t7" translation='0 0 .8583'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t33" DEF="t8" translation='0 0 .8652'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t34" DEF="t0" translation='0 0 .8722'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="t35" DEF="t1" translation='0 0 .8792'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t36" DEF="t2" translation='0 0 .8862'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t37" DEF="t3" translation='0 0 .8932'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="t38" DEF="t4" translation='0 0 .9001'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t39" DEF="t5" translation='0 0 .9071'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t40" DEF="t6" translation='0 0 .9141'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+			<transform id="t41" DEF="t7" translation='0 0 .9211'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t42" DEF="t8" translation='0 0 .9280'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t43" DEF="t1" translation='0 0 .9350'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+			<transform id="t44" DEF="t1" translation='0 0 .9420'>
+				<shape>
+					<appearance>
+						<material diffuseColor='1 0 0'></material>
+					</appearance>
+
+					<sphere radius="0.0174"></sphere>
+				</shape>
+			</transform>
+
+		</scene>
+	</x3d>
+	</div>
+
+</body>
+<footer>
+
+</footer>
+
+</html>
